@@ -1,9 +1,12 @@
 // importação de dependência(s)
-
+import express from "express"
+import path from "path"
 
 // variáveis globais deste módulo
 const PORT = 3000
 const db = {}
+const app = express();
+const __dirname = path.resolve();
 
 
 // carregar "banco de dados" (data/jogadores.json e data/jogosPorJogador.json)
@@ -37,7 +40,11 @@ const db = {}
 // EXERCÍCIO 1
 // configurar para servir os arquivos estáticos da pasta "client"
 // dica: 1 linha de código
+app.use(express.static(`${__dirname}/client`));
 
 
 // abrir servidor na porta 3000 (constante PORT)
 // dica: 1-3 linhas de código
+const server = app.listen(PORT, () =>
+    console.log(`Server start on port ${PORT}`)
+);
