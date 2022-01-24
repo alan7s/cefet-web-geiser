@@ -30,7 +30,7 @@ app.set('views', 'server/views');
 // dados do banco de dados "data/jogadores.json" com a lista de jogadores
 // dica: o handler desta função é bem simples - basta passar para o template
 //       os dados do arquivo data/jogadores.json (~3 linhas)
-app.get('/', function(request, response){
+app.get('/', function (request, response) {
     response.render('index', db.players);
 });
 
@@ -39,7 +39,27 @@ app.get('/', function(request, response){
 // jogador, usando os dados do banco de dados "data/jogadores.json" e
 // "data/jogosPorJogador.json", assim como alguns campos calculados
 // dica: o handler desta função pode chegar a ter ~15 linhas de código
+app.get('/jogador/:id/', function (request, response) {
+    const id = request.params.id;
+    const jogador = db.players.players.find(j => j.steamid === id);
+    const jogosDoJogador = db.jogosPorJogador[jogador.steamid];
+    const qtdJogosNaoJogados = jogosDoJogador.games.filter(j => j.playtime_forever === 0).length;
 
+    jogosDoJogador.games.sort((a, b) => b.playtime_forever - a.playtime_forever);
+    jogosDoJogador.games = jogosDoJogador.games.slice(0, 5);
+    jogosDoJogador.games.forEach(game => {
+        game.playtime_forever = Math.floor(game.playtime_forever / 60);
+    });
+
+    response.render('jogador', {
+        perfil: jogador,
+        jogos: jogosDoJogador,
+        qtdJogos: jogosDoJogador.game_count,
+        totalJogosNaoJogados: qtdJogosNaoJogados,
+        jogosMaisJogados: jogosDoJogador.games,
+        jogoFavorito: jogosDoJogador.games[0]
+    });
+});
 
 // EXERCÍCIO 1
 // configurar para servir os arquivos estáticos da pasta "client"
